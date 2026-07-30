@@ -18,7 +18,7 @@ jobs:
 
       # Step 3: Build test Docker image using development Dockerfile for testing
       - name: Build test image
-        run: docker build -t rohansharma029/multi-client -f Dockerfile.dev ./client
+        run: docker build -t rohansharma029/multi-client -f .client/Dockerfile.dev ./client
       # Step 4: Run tests on the built image
       - name: Run tests
         run: docker run -e CI=true rohansharma029/multi-client npm test
