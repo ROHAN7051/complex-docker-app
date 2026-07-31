@@ -19,9 +19,11 @@ jobs:
       # Step 3: Build test Docker image using development Dockerfile for testing
       - name: Build test image
         run: docker build -t rohansharma029/multi-client -f ./client/Dockerfile.dev ./client
+
       # Step 4: Run tests on the built image
       - name: Run tests
         run: docker run -e CI=true rohansharma029/multi-client npm test
+
       # Step 5: Build production Docker images
       - name: Build production images
         run: |
@@ -29,6 +31,7 @@ jobs:
           docker build -t rohansharma029/multi-server ./server
           docker build -t rohansharma029/multi-worker ./worker
           docker build -t rohansharma029/multi-nginx ./nginx
+
       # Step 6: Push production images to Docker Hub
       - name: Push production images to Docker Hub
         run: |
@@ -36,7 +39,12 @@ jobs:
           docker push rohansharma029/multi-server
           docker push rohansharma029/multi-worker
           docker push rohansharma029/multi-nginx
-      # Step 7: Deploy to AWS Elastic Beanstalk
+
+      # Step 7: Generate deployment package
+      - name: Generate deployment package
+        run: zip -r deploy.zip . -x '*.git*'
+
+      # Step 8: Deploy to AWS Elastic Beanstalk
       - name: Deploy to AWS Elastic Beanstalk
         uses: einaregilsson/beanstalk-deploy@v21
         with:
@@ -45,6 +53,6 @@ jobs:
           application_name: multi-docker
           environment_name: Multi-docker-env
           region: ap-south-1
-          bucket_name: elasticbeanstalk-ap-south-1-143920986966
+          existing_bucket_name: elasticbeanstalk-ap-south-1-143920986966
           version_label: ${{ github.sha }}
           deployment_package: deploy.zip
